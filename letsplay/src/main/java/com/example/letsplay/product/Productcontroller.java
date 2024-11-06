@@ -44,9 +44,12 @@ public class Productcontroller {
     public ResponseEntity<?> addProduct(@Valid @RequestBody Product product , HttpSession session) {
        
         Object userId = session.getAttribute("userid");
-
-        product.setUserId(userId.toString());
-        productservice.insert(product);
+        try {
+            product.setUserId(userId.toString());
+            productservice.insert(product);
+        } catch (Exception e) {
+            ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok().body("product added");
     }
     

@@ -29,13 +29,7 @@ public class User {
 
     public User() {}
 
-    public User(String id, String name, String email, Role role ,  String password) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.role = role;
-        this.password = password;
-    }
+
 
     public User(String name, String email, Role role ,  String password) {
         this.name = name;

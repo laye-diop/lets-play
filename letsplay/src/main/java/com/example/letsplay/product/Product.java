@@ -30,13 +30,7 @@ public class Product {
 
     public Product() {}
 
-    public Product(String description, String id, String name, Double price, String userId) {
-        this.description = description;
-        this.id = id;
-        this.name = name;
-        this.price = price;
-        this.userId = userId;
-    }
+
 
     public Product(String description, String name, Double price, String userId) {
         this.description = description;

@@ -65,7 +65,12 @@ public class Usercontroller {
         }
        
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userservice.insert(user);
+
+        try {
+            userservice.insert(user);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok().body("ok");
     }
 
