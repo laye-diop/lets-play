@@ -3,15 +3,28 @@ package com.example.letsplay.user;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Document("User")
 public class User {
     
     @Id
     private String id;
+
+    @NotNull(message = "the name is required")
+    @Size(min = 3, message = "Le nom de passe doit contenir au moins 3 caractères")
     private String name;
+
+    @NotNull(message = "the email is required")
+    @Email(groups = LoginInfo.class  ,message = "Veuillez entrer une adresse email valide")
     private String email;
+
+    @NotNull(groups = {LoginInfo.class , PasswordInfo.class}, message = "Le mot de passe est obligatoire")
+    @Size(min = 6, message = "Le mot de passe doit contenir au moins 6 caractères")
     private String password;
+
     private Role role;
 
     public User() {}
@@ -75,12 +88,7 @@ public class User {
         return email;
     }
 
-    public boolean Isvalid() {
-        return  this.name != null  && this.email != null && this.password != null;
-    }
-
-    public boolean Isvalidpassword() {
-        return  this.password != null && this.password.length() > 5;
-    }
+    public interface LoginInfo {}
+    public interface PasswordInfo {}
 
 }

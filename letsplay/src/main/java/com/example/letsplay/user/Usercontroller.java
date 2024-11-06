@@ -1,40 +1,47 @@
 package com.example.letsplay.user;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+
 
 
 @RestController
 public class Usercontroller {
 
 
-    private final PasswordEncoder passwordEncoder;
-    private final Userservice userservice;
-    
     @Autowired
-    public Usercontroller(Userservice userservice , PasswordEncoder passwordEncoder) {
-        this.userservice = userservice;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private  PasswordEncoder passwordEncoder;
+    @Autowired
+    private  Userservice userservice;
+    
 
+    @GetMapping("/users")
+    public List<User> getMethodName() {
+        return userservice.getUsers();
+    }
+    
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody User user ,  HttpSession session) {
+    public ResponseEntity<String> login(@Validated(User.LoginInfo.class) @RequestBody User user ,  HttpSession session) {
 
         Optional<User>  us =  userservice.getuser(user.getEmail());
         
-        if (us.isPresent() && user.Isvalid()) {
+        if (us.isPresent()) {
             User newuser  = us.get();
             if (passwordEncoder.matches(user.getPassword(), newuser.getPassword())) {
 
@@ -50,11 +57,11 @@ public class Usercontroller {
 
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user) {
+    public ResponseEntity<String> register(@Valid @RequestBody User user) {
 
 
-        if (!user.Isvalid() || userservice.getuser(user.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body("bad reqest");
+        if (userservice.getuser(user.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().body("email already exists");
         }
        
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -64,12 +71,12 @@ public class Usercontroller {
 
 
     @PutMapping("/changepassword")
-    public ResponseEntity<String> updatePassword(HttpSession session , @RequestBody User newuser) {
+    public ResponseEntity<String> updatePassword(HttpSession session ,@Validated(User.PasswordInfo.class) @RequestBody User newuser) {
 
         Object userId =  session.getAttribute("userid");
-        if (!newuser.Isvalidpassword() || userId == null) {
-            return ResponseEntity.badRequest().body("bad request");
-        }
+        if (userId == null) {
+            return ResponseEntity.status(403).body("access denied");
+        } 
         
         Optional<User> userObj = userservice.getuserById(userId.toString());
        
@@ -81,7 +88,8 @@ public class Usercontroller {
         }
         return ResponseEntity.badRequest().body("bad request");
     }
-
+    
+    @PreAuthorize("@userservice.Connected(#session)")
     @DeleteMapping("/deletemyaccount")
     public ResponseEntity<String> deleteUser(@RequestBody String entity , HttpSession session) {
         Object userId =  session.getAttribute("userid");
@@ -93,7 +101,6 @@ public class Usercontroller {
             session.invalidate();
             return ResponseEntity.ok().body("account deleted");
         }
-
         return ResponseEntity.badRequest().body("bad request");
     }
     

@@ -6,15 +6,14 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jakarta.servlet.http.HttpSession;
+
 @Service
 public class Userservice {
 
-    private final  UserRepository repository;
-
     @Autowired
-    public Userservice(UserRepository repository) {
-        this.repository = repository;
-    }
+    private   UserRepository repository;
+
 
     public List<User> getAll() {
         return repository.findAll();
@@ -36,6 +35,18 @@ public class Userservice {
 
     public void delete(User user) {
        repository.delete(user);
+    }
+    public List<User> getUsers() {
+        List<User> users = repository.findAll();
+
+        users.forEach((u) -> {
+            u.setPassword("");
+        });
+
+        return users;
+    }
+    public boolean Connected(HttpSession session)  {
+        return  session.getAttribute("userid") != null;
     }
    
 }

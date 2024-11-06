@@ -2,15 +2,30 @@ package com.example.letsplay.product;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Document("Product")
 public class Product {
 
     @Id
     private String id;
+    
+    @NotNull(message = "the name is required")
+    @Size(min = 2, message = "Le nom de passe doit contenir au moins 2 caractères")
     private String name;
+
+    @NotNull(message = "the description is required")
+    @Size(min = 2, message = "La nom description doit contenir au moins 2 caractères")
     private String description;
+
+    @NotNull(message = "the price is required")
     private Double price;
+
+
+    @Field("owner")
     private String userId;
 
     public Product() {}
@@ -69,12 +84,5 @@ public class Product {
     public void setUserId(String userId) {
         this.userId = userId;
     }
-
-    public boolean isValid() {
-        return this.name != null && this.price != null && this.description != null;
-    }
-
-
-
 
 }
