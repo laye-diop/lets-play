@@ -19,6 +19,7 @@ public class Userservice {
         return repository.findAll();
     }
     public void insert(User u) {
+        u.setId(null);
         repository.insert(u);
     }
     public Optional<User> getuser(String email) {

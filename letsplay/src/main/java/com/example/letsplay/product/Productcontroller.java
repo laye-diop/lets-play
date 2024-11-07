@@ -80,9 +80,13 @@ public class Productcontroller {
             Product product = productObj.get();
 
             if (IsProductOwner(session, product.getUserId())) {
-                newproduct.setId(session.getAttribute("userid").toString());
-                productservice.update(product ,newproduct);
-                return ResponseEntity.ok().body("product updated");
+                try {
+                    newproduct.setId(session.getAttribute("userid").toString());
+                    productservice.update(product ,newproduct);
+                    return ResponseEntity.ok().body("product updated");
+                } catch (Exception e) {
+                    return ResponseEntity.badRequest().build();
+                }
             } else {
                 return  ResponseEntity.status(403).body("you are not the owner");
             }
@@ -100,8 +104,12 @@ public class Productcontroller {
         if (productObj.isPresent()) {
             Product product = productObj.get();
             if (IsProductOwner(session, product.getUserId())) {
-                productservice.remove(product);
-                return ResponseEntity.ok().body("product deleted");
+                try {
+                    productservice.remove(product);
+                    return ResponseEntity.ok().body("product deleted");
+                } catch (Exception e) {
+                    return ResponseEntity.badRequest().build();
+                }
             } else {
                 return ResponseEntity.status(403).body("you are not the owner");
             }

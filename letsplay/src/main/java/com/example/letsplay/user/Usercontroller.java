@@ -88,8 +88,12 @@ public class Usercontroller {
         if (userObj.isPresent()) {
             User user = userObj.get();
             newuser.setPassword(passwordEncoder.encode(newuser.getPassword()));
-            userservice.upate(user , newuser);
-            return ResponseEntity.ok().body("password changed");
+            try {
+                userservice.upate(user , newuser);
+                return ResponseEntity.ok().body("password changed");
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().build();
+            }
         }
         return ResponseEntity.badRequest().body("bad request");
     }
@@ -102,9 +106,13 @@ public class Usercontroller {
 
         if (userObj.isPresent()) {
             User user = userObj.get();
-            userservice.delete(user);
-            session.invalidate();
-            return ResponseEntity.ok().body("account deleted");
+            try {
+                userservice.delete(user);
+                session.invalidate();
+                return ResponseEntity.ok().body("account deleted");
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().build();
+            }
         }
         return ResponseEntity.badRequest().body("bad request");
     }

@@ -21,6 +21,7 @@ public class Productservice {
     }
         
     public void insert(Product p) {
+        p.setId(null);
         repository.insert(p);
     }
     public boolean  ConnectedAndSeller(HttpSession session) {
